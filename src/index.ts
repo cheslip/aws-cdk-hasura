@@ -10,10 +10,14 @@ export interface HasuraServiceProps
   cluster?: ecs.ICluster;
 }
 
+export interface HasuraRdsProps extends Omit<rds.DatabaseInstanceProps, | "engine" | "vpc" | "masterUsername"> {
+  masterUsername?: string;
+}
+
 export interface HasuraProps {
   vpc: ec2.IVpc;
-  rds: Omit<rds.DatabaseInstanceProps, "engine" | "vpc">;
-  hasuraServiceProps: HasuraServiceProps;
+  rds?: HasuraRdsProps;
+  hasuraServiceProps?: HasuraServiceProps;
   hasuraOptions?: {
     version?: string;
     enableTelemetry?: boolean;
@@ -39,32 +43,45 @@ export class Hasura extends Construct {
   ) {
     super(scope, id);
 
+    // database name
+    let databaseName = props.rds?.databaseName || "postgres";
+
+    // database username
+    let username = props.rds?.masterUsername || "hasura";
+
     // setup password secret
-    let passwordSecret = props.rds.masterUserPassword;
+    let passwordSecret = props.rds?.masterUserPassword;
     if (!passwordSecret) {
       this.passwordSecret = this.getHasuraSecret("InstancePassword");
       passwordSecret = this.passwordSecret.secretValue;
     }
+
 
     // postgres database instance
     this.postgres = new rds.DatabaseInstance(this, "Instance", {
       engine: rds.DatabaseInstanceEngine.POSTGRES,
       vpc: props.vpc,
       ...(props.rds as rds.DatabaseInstanceProps),
-      masterUserPassword: props.rds.masterUserPassword || passwordSecret,
+      databaseName: databaseName,
+      masterUsername: username,
+      masterUserPassword: passwordSecret,
+      instanceClass: props.rds?.instanceClass || ec2.InstanceType.of(
+        ec2.InstanceClass.BURSTABLE2,
+        ec2.InstanceSize.LARGE
+      ),
     });
 
     // postgres connection string
-    this.connectionString = `postgres://${props.rds.databaseName}:${passwordSecret}@${this.postgres.dbInstanceEndpointAddress}:${this.postgres.dbInstanceEndpointPort}/${props.rds.databaseName}`;
+    this.connectionString = `postgres://${username}:${passwordSecret}@${this.postgres.dbInstanceEndpointAddress}:${this.postgres.dbInstanceEndpointPort}/${databaseName}`;
 
     // ALB / Fargate / Hasura container setup
     this.service = new ecs_patterns.ApplicationLoadBalancedFargateService(
       this,
       "Hasura",
       {
-        ...props.hasuraServiceProps,
+        ...props.hasuraServiceProps || {},
         cluster:
-          props.hasuraServiceProps.cluster ||
+          props.hasuraServiceProps?.cluster ||
           new ecs.Cluster(this, "Cluster", {
             vpc: props.vpc,
           }),
@@ -72,6 +89,7 @@ export class Hasura extends Construct {
           image: ecs.ContainerImage.fromRegistry(
             `hasura/graphql-engine:${props.hasuraOptions?.version || "latest"}`
           ),
+          
           containerPort: 8080,
           environment: this.getEnvironment(),
         },
