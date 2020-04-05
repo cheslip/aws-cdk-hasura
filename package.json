@@ -1,0 +1,36 @@
+{
+  "name": "aws-cdk-hasura",
+  "version": "0.1.0",
+  "description": "Hasura construct for AWS CDK",
+  "main": "dist/index.js",
+  "repository": "https://github.com/cheslip/aws-cdk-hasura",
+  "author": "Cory Heslip",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "cdk": "cdk"
+  },
+  "dependencies": {
+    "@aws-cdk/aws-ec2": "^1.31.0",
+    "@aws-cdk/aws-ecs": "^1.31.0",
+    "@aws-cdk/aws-ecs-patterns": "^1.31.0",
+    "@aws-cdk/aws-elasticloadbalancingv2": "^1.31.0",
+    "@aws-cdk/aws-rds": "^1.31.0",
+    "@aws-cdk/aws-route53": "^1.31.0",
+    "@aws-cdk/aws-secretsmanager": "^1.31.0",
+    "@aws-cdk/core": "^1.31.0"
+  },
+  "devDependencies": {
+    "@aws-cdk/assert": "1.31.0",
+    "@types/jest": "^24.0.22",
+    "@types/node": "10.17.5",
+    "aws-cdk": "1.31.0",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.1.0",
+    "ts-node": "^8.1.0",
+    "typescript": "~3.7.2"
+  }
+}
