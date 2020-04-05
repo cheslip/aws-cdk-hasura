@@ -284,7 +284,7 @@
     "@aws-cdk/core" "1.31.0"
     constructs "^2.0.0"
 
-"@aws-cdk/aws-elasticloadbalancingv2@1.31.0", "@aws-cdk/aws-elasticloadbalancingv2@^1.31.0":
+"@aws-cdk/aws-elasticloadbalancingv2@1.31.0":
   version "1.31.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/aws-elasticloadbalancingv2/-/aws-elasticloadbalancingv2-1.31.0.tgz#e25aaf086d73b1b7a3c8993c26561fbd88788ef5"
   integrity sha512-Arld9blEl2ZTLj293FWaJvfpkaEKRBZBUp9ky7jGLJciY9JKYjTMwCNzGb+Eveuh8X7uhKL1A1OW2Kj+UEHNLg==
@@ -406,7 +406,7 @@
     "@aws-cdk/region-info" "1.31.0"
     constructs "^2.0.0"
 
-"@aws-cdk/aws-route53@1.31.0", "@aws-cdk/aws-route53@^1.31.0":
+"@aws-cdk/aws-route53@1.31.0":
   version "1.31.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/aws-route53/-/aws-route53-1.31.0.tgz#76861d192922cf3c05dbc47d4e8c3f87cb500f58"
   integrity sha512-Lx4EjjW3kt5hQ0cZuw0HlOtA6B2Z+DD1RJAFhVpwBClbA59xf2/Ry0yKnyDeQzkDcosf3k758VEpZwSELMY8yw==

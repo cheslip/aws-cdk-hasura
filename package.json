@@ -1,6 +1,6 @@
 {
   "name": "aws-cdk-hasura",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Hasura construct for AWS CDK",
   "main": "dist/index.js",
   "repository": "https://github.com/cheslip/aws-cdk-hasura",
@@ -17,9 +17,7 @@
     "@aws-cdk/aws-ec2": "^1.31.0",
     "@aws-cdk/aws-ecs": "^1.31.0",
     "@aws-cdk/aws-ecs-patterns": "^1.31.0",
-    "@aws-cdk/aws-elasticloadbalancingv2": "^1.31.0",
     "@aws-cdk/aws-rds": "^1.31.0",
-    "@aws-cdk/aws-route53": "^1.31.0",
     "@aws-cdk/aws-secretsmanager": "^1.31.0",
     "@aws-cdk/core": "^1.31.0"
   },
