@@ -10,8 +10,9 @@ export interface HasuraServiceProps
   cluster?: ecs.ICluster;
 }
 
-export interface HasuraRdsProps extends Omit<rds.DatabaseInstanceProps, | "engine" | "vpc" | "masterUsername"> {
+export interface HasuraRdsProps extends Omit<rds.DatabaseInstanceProps, | "engine" | "vpc" | "masterUsername" | "instanceClass"> {
   masterUsername?: string;
+  instanceClass?: ec2.InstanceType;
 }
 
 export interface HasuraProps {
@@ -62,6 +63,7 @@ export class Hasura extends Construct {
       engine: rds.DatabaseInstanceEngine.POSTGRES,
       vpc: props.vpc,
       ...(props.rds as rds.DatabaseInstanceProps),
+      vpcPlacement: props.rds?.vpcPlacement || { subnetType: ec2.SubnetType.PUBLIC },
       databaseName: databaseName,
       masterUsername: username,
       masterUserPassword: passwordSecret,
@@ -80,6 +82,7 @@ export class Hasura extends Construct {
       "Hasura",
       {
         ...props.hasuraServiceProps || {},
+        assignPublicIp: props.hasuraServiceProps?.assignPublicIp || true,
         cluster:
           props.hasuraServiceProps?.cluster ||
           new ecs.Cluster(this, "Cluster", {
