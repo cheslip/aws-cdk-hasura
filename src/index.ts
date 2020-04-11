@@ -1,4 +1,4 @@
-import { Construct, SecretValue } from "@aws-cdk/core";
+import { Construct } from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
 import * as ecs from "@aws-cdk/aws-ecs";
 import * as ecs_patterns from "@aws-cdk/aws-ecs-patterns";
@@ -10,7 +10,11 @@ export interface HasuraServiceProps
   cluster?: ecs.ICluster;
 }
 
-export interface HasuraRdsProps extends Omit<rds.DatabaseInstanceProps, | "engine" | "vpc" | "masterUsername" | "instanceClass"> {
+export interface HasuraRdsProps
+  extends Omit<
+    rds.DatabaseInstanceProps,
+    "engine" | "vpc" | "masterUsername" | "instanceClass"
+  > {
   masterUsername?: string;
   instanceClass?: ec2.InstanceType;
 }
@@ -23,10 +27,13 @@ export interface HasuraProps {
     version?: string;
     enableTelemetry?: boolean;
     enableConsole?: boolean;
-    adminSecret?: SecretValue;
-    jwtSecret?: SecretValue;
+    adminSecret?: secrets.ISecret;
+    jwtSecret?: secrets.ISecret;
     env?: {
       [x: string]: string;
+    };
+    secrets?: {
+      [x: string]: ecs.Secret
     };
   };
 }
@@ -57,20 +64,23 @@ export class Hasura extends Construct {
       passwordSecret = this.passwordSecret.secretValue;
     }
 
-
     // postgres database instance
     this.postgres = new rds.DatabaseInstance(this, "Instance", {
       engine: rds.DatabaseInstanceEngine.POSTGRES,
       vpc: props.vpc,
       ...(props.rds as rds.DatabaseInstanceProps),
-      vpcPlacement: props.rds?.vpcPlacement || { subnetType: ec2.SubnetType.PUBLIC },
+      vpcPlacement: props.rds?.vpcPlacement || {
+        subnetType: ec2.SubnetType.PUBLIC,
+      },
       databaseName: databaseName,
       masterUsername: username,
       masterUserPassword: passwordSecret,
-      instanceClass: props.rds?.instanceClass || ec2.InstanceType.of(
-        ec2.InstanceClass.BURSTABLE2,
-        ec2.InstanceSize.LARGE
-      ),
+      instanceClass:
+        props.rds?.instanceClass ||
+        ec2.InstanceType.of(
+          ec2.InstanceClass.BURSTABLE2,
+          ec2.InstanceSize.LARGE
+        ),
     });
 
     // postgres connection string
@@ -81,7 +91,7 @@ export class Hasura extends Construct {
       this,
       "Hasura",
       {
-        ...props.hasuraServiceProps || {},
+        ...(props.hasuraServiceProps || {}),
         assignPublicIp: props.hasuraServiceProps?.assignPublicIp || true,
         cluster:
           props.hasuraServiceProps?.cluster ||
@@ -92,9 +102,9 @@ export class Hasura extends Construct {
           image: ecs.ContainerImage.fromRegistry(
             `hasura/graphql-engine:${props.hasuraOptions?.version || "latest"}`
           ),
-          
           containerPort: 8080,
           environment: this.getEnvironment(),
+          secrets: this.getSecrets(),
         },
       }
     );
@@ -122,23 +132,33 @@ export class Hasura extends Construct {
         : "false",
     };
 
-    if (this.props.hasuraOptions?.jwtSecret) {
-      environment.HASURA_GRAPHQL_JWT_SECRET = this.props.hasuraOptions.jwtSecret.toString();
-    }
-
-    if (this.props.hasuraOptions?.adminSecret) {
-      environment.HASURA_GRAPHQL_ADMIN_SECRET = this.props.hasuraOptions.adminSecret.toString();
-    } else {
-      environment.HASURA_GRAPHQL_ADMIN_SECRET = this.getHasuraSecret(
-        "AdminSecret"
-      ).secretValue.toString();
-    }
-
     if (this.props.hasuraOptions?.env) {
       environment = { ...environment, ...this.props.hasuraOptions.env };
     }
 
     return environment;
+  }
+
+  private getSecrets(): { [x: string]: ecs.Secret } {
+    let secrets: { [x: string]: ecs.Secret } = {};
+
+    if (this.props.hasuraOptions?.adminSecret) {
+      secrets.HASURA_GRAPHQL_ADMIN_SECRET = ecs.Secret.fromSecretsManager(this.props.hasuraOptions.adminSecret);
+    } else {
+      secrets.HASURA_GRAPHQL_ADMIN_SECRET = ecs.Secret.fromSecretsManager(
+        this.getHasuraSecret("AdminSecret")
+      );
+    }
+
+    if (this.props.hasuraOptions?.jwtSecret) {
+      secrets.HASURA_GRAPHQL_JWT_SECRET = ecs.Secret.fromSecretsManager(this.props.hasuraOptions.jwtSecret);
+    }
+
+    if (this.props.hasuraOptions?.secrets) {
+      secrets = { ...secrets, ...this.props.hasuraOptions.secrets };
+    }
+
+    return secrets;
   }
 
   /**
