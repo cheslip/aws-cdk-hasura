@@ -76,7 +76,7 @@ export class Hasura extends Construct {
       masterUsername: username,
       masterUserPassword: passwordSecret,
       instanceType:
-        props.rds?.instanceClass ||
+        props.rds?.instanceType ||
         ec2.InstanceType.of(
           ec2.InstanceClass.BURSTABLE2,
           ec2.InstanceSize.LARGE
