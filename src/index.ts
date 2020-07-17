@@ -69,7 +69,7 @@ export class Hasura extends Construct {
     this.postgres = new rds.DatabaseInstance(this, "Instance", {
       engine: rds.DatabaseInstanceEngine.POSTGRES,
       vpc: props.vpc,
-      ...(props.rds as rds.DatabaseInstanceProps),
+      ...props.rds,
       vpcPlacement: props.rds?.vpcPlacement || {
         subnetType: ec2.SubnetType.PUBLIC,
       },
