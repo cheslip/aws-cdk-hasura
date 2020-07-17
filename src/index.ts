@@ -25,6 +25,7 @@ export interface HasuraProps {
   hasuraServiceProps?: HasuraServiceProps;
   hasuraOptions?: {
     version?: string;
+    imageName?: string;
     enableTelemetry?: boolean;
     enableConsole?: boolean;
     adminSecret?: secrets.ISecret;
@@ -39,7 +40,7 @@ export interface HasuraProps {
 }
 
 export class Hasura extends Construct {
-  private readonly connectionString: string;
+  public readonly connectionString: string;
   public readonly service: ecs_patterns.ApplicationLoadBalancedFargateService;
   public readonly postgres: rds.DatabaseInstance;
   public readonly passwordSecret?: secrets.Secret;
@@ -100,7 +101,7 @@ export class Hasura extends Construct {
           }),
         taskImageOptions: {
           image: ecs.ContainerImage.fromRegistry(
-            `hasura/graphql-engine:${props.hasuraOptions?.version || "latest"}`
+            `${props.hasuraOptions?.imageName || "hasura/graphql-engine"}:${props.hasuraOptions?.version || "latest"}`
           ),
           containerPort: 8080,
           environment: this.getEnvironment(),
