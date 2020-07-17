@@ -1,6 +1,6 @@
 {
   "name": "aws-cdk-hasura",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Hasura construct for AWS CDK",
   "main": "dist/index.js",
   "repository": "https://github.com/cheslip/aws-cdk-hasura",
