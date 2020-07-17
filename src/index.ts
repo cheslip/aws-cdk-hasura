@@ -13,10 +13,9 @@ export interface HasuraServiceProps
 export interface HasuraRdsProps
   extends Omit<
     rds.DatabaseInstanceProps,
-    "engine" | "vpc" | "masterUsername" | "instanceClass"
+    "engine" | "vpc" | "masterUsername"
   > {
   masterUsername?: string;
-  instanceClass?: ec2.InstanceType;
 }
 
 export interface HasuraProps {
@@ -76,7 +75,7 @@ export class Hasura extends Construct {
       databaseName: databaseName,
       masterUsername: username,
       masterUserPassword: passwordSecret,
-      instanceClass:
+      instanceType:
         props.rds?.instanceClass ||
         ec2.InstanceType.of(
           ec2.InstanceClass.BURSTABLE2,
