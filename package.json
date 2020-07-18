@@ -15,15 +15,15 @@
     "cdk": "cdk"
   },
   "dependencies": {
-    "@aws-cdk/aws-ec2": "^1.51.0",
-    "@aws-cdk/aws-ecs": "^1.51.0",
-    "@aws-cdk/aws-ecs-patterns": "^1.51.0",
-    "@aws-cdk/aws-rds": "^1.51.0",
-    "@aws-cdk/aws-secretsmanager": "^1.51.0",
-    "@aws-cdk/core": "^1.51.0"
+    "@aws-cdk/aws-ec2": "^1.52.0",
+    "@aws-cdk/aws-ecs": "^1.52.0",
+    "@aws-cdk/aws-ecs-patterns": "^1.52.0",
+    "@aws-cdk/aws-rds": "^1.52.0",
+    "@aws-cdk/aws-secretsmanager": "^1.52.0",
+    "@aws-cdk/core": "^1.52.0"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "^1.51.0",
+    "@aws-cdk/assert": "^1.52.0",
     "@types/jest": "^24.0.22",
     "@types/node": "10.17.5",
     "jest": "^24.9.0",
